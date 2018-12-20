@@ -14,13 +14,10 @@
 		"sourceType": "module"
 	},
 	"rules": {
+		"no-process-env": 0,
 		"indent": [
 			"error",
 			"tab"
-		],
-		"linebreak-style": [
-			"error",
-			"unix"
 		],
 		"quotes": [
 			"error",
