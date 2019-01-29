@@ -6,10 +6,26 @@ const config = require('./db');
 
 const users = require('./routes/user'); 
 
-mongoose.connect(config.DB, { useNewUrlParser: true }).then(
-	() => {console.log('Database is connected'); },
-	err => { console.log('Can not connect to the database'+ err); }
-);
+if(config.useMongo) {
+	mongoose.connect(config.mongo.dbUrl, { useNewUrlParser: true }).then(
+		() => {console.log('Database is connected'); },
+		err => { console.log('Can not connect to the database'+ err); }
+	);
+}
+if(config.useSql){
+	var Sequelize = require('sequelize');
+	var sequelize = new Sequelize(config.sql.db,{define: {
+		timestamps: false
+	}});
+	sequelize
+		.authenticate()
+		.then(() => {
+			console.log('Connection has been established successfully.');
+		})
+		.catch(err => {
+			console.error('Unable to connect to the database:', err);
+		});
+}
 
 const app = express();
 app.use(passport.initialize());
@@ -19,6 +35,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use('/api/users', users);
+
+// REGISTER OUR ROUTES -------------------------------
+require('./routes/api').default(app);
 
 app.get('/', function(req, res) {
 	res.send('hello');
