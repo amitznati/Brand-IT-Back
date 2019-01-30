@@ -1,30 +1,32 @@
 /**
  * Using Rails-like standard naming convention for endpoints.
- * POST	/products			   ->  create
- * GET	 /products			   ->  getAll
- * GET	 /products /:id		  ->  getByID
- * DELETE  /products /:id		  ->  removeByID
- * PATCH   /products /:id		  ->  updateByID
+ * POST	/kit				 ->	create
+ * GET	 /kit				 ->	getAll
+ * GET	 /kit /:id			->	getByID
+ * DELETE	/kit /:id			->	removeByID
+ * PATCH	 /kit /:id			->	updateByID
  */
 
 //const _ = require('lodash');
 //const {ObjectID} = require('mongodb');
 const GLOBAL_RESPONSES = require('../global/responses');
 const LOCAL_RESPONSES = require('./responses');
-const MODEL_PATH = './model/products';
-const MODEL_SERVICE = require(MODEL_PATH);
+
+const {Kit,Category} = require('./../sequelize');
+
 
 
 exports.create = function(req, res) {
-	let ModelInstance = MODEL_SERVICE;
+	let ModelInstance = Kit;
 	// force: true will drop the table if it already exists
 	ModelInstance.sync({force: false}).then(function () {
-	// Table created
+		// Table created
 		return ModelInstance.create({
-			name : req.body.name
-		}).then((products) => {
+			name : req.body.name,
+			CategoryId: req.body.category_id
+		}).then((kit) => {
 			let resultResponse = GLOBAL_RESPONSES.CREATE_SUCCESS;
-			resultResponse.resourceId = products.dataValues.id;
+			resultResponse.resourceId = kit.dataValues.id;
 			res.json({resultResponse});
 		}).catch((err) =>{
 			res.send(err);
@@ -34,17 +36,17 @@ exports.create = function(req, res) {
 
 
 exports.getAll = function (req, res) {
-	let ModelInstance = MODEL_SERVICE;
+	let ModelInstance = Kit;
 	// force: true will drop the table if it already exists
 	ModelInstance.sync({force: false}).then(function () {
 		// Table created
 		return ModelInstance.findAll({
 			limit: 40
-		}).then((products_result) => {
-			if(!products_result || (products_result && products_result.length == 0)){
-				res.json(LOCAL_RESPONSES.PRODUCTS_NOT_FOUND);
+		}).then((kit_result) => {
+			if(!kit_result || (kit_result && kit_result.length == 0)){
+				res.json(LOCAL_RESPONSES.KIT_NOT_FOUND);
 			}
-			res.json(products_result);
+			res.json(kit_result);
 		}).catch((err) =>{
 			res.send(err);
 		});
@@ -55,19 +57,20 @@ exports.getAll = function (req, res) {
 
 
 exports.getByID = function (req, res) {
-	let ModelInstance = MODEL_SERVICE;
+	let ModelInstance = Kit;
 	// force: true will drop the table if it already exists
-	ModelInstance.sync({force: false}).then(function () {
+	ModelInstance.sync().then(function () {
 		// Table created
-		return ModelInstance.findOne({
+		return Kit.findOne({
+			include: [Category],
 			where: {
-				id: req.params.products_id,
+				id: req.params.kit_id,
 			},
-		}).then((products) => {
-			if(!products){
-				res.json(LOCAL_RESPONSES.PRODUCTS_NOT_FOUND);
+		}).then((kit) => {
+			if(!kit){
+				res.json(LOCAL_RESPONSES.KIT_NOT_FOUND);
 			}
-			res.json(products);
+			res.json(kit);
 		}).catch((err) =>{
 			res.send(err);
 		});
@@ -77,13 +80,13 @@ exports.getByID = function (req, res) {
 
 
 exports.removeByID = function (req, res) {
-	let ModelInstance = MODEL_SERVICE;
+	let ModelInstance = Kit;
 	// force: true will drop the table if it already exists
 	ModelInstance.sync({force: false}).then(function () {
 		// Table created
 		return ModelInstance.destroy({
 			where: {
-				id: req.params.products_id,
+				id: req.params.kit_id,
 			},
 		}).then((/*results*/) => {
 			res.json(GLOBAL_RESPONSES.DELETE_SUCCESS);
@@ -96,10 +99,10 @@ exports.removeByID = function (req, res) {
 
 
 exports.updateByID = function (req, res) {
-	let ModelInstance = MODEL_SERVICE;
+	let ModelInstance = Kit;
 	// force: true will drop the table if it already exists
 	ModelInstance.sync({force: false}).then(function () {
-		ModelInstance.find({ where: { id: req.params.products_id } }).then((model) =>
+		ModelInstance.find({ where: { id: req.params.kit_id } }).then((model) =>
 		{
 		// Check if record exists in db
 			if (model) {
@@ -113,7 +116,7 @@ exports.updateByID = function (req, res) {
 					});
 			}
 		}).catch((/*err*/) => {
-			res.send(LOCAL_RESPONSES.PRODUCTS_NOT_FOUND);
+			res.send(LOCAL_RESPONSES.KIT_NOT_FOUND);	
 		});
 	});
 };

@@ -5,10 +5,8 @@ const baseAPI = '/api';
 exports.default = function(app) {
 
 
-	app.use(baseAPI+'/themes', require('../api/themes'));
-	app.use(baseAPI+'/categories', require('../api/categories'));
-	app.use(baseAPI+'/products', require('../api/products'));
-	app.use(baseAPI+'/kits', require('../api/kits'));
+	app.use(baseAPI+'/categories', require('../api/category'));
+	app.use(baseAPI+'/kits', require('../api/kit'));
 	// LASTLINE
 
 };

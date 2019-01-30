@@ -1,5 +1,5 @@
 const LOCAL_RESPONSES = {
-	'KITS_NOT_FOUND'	  : {'message':'Products was not found'}
+	'PRODUCT_NOT_FOUND'	  : {'message':'Product was not found'}
 };
 
 module.exports = LOCAL_RESPONSES;

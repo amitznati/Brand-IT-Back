@@ -1,14 +1,13 @@
 const {Router} = require('express');
 //const {authenticate} = require('./../../middleware/authenticate');
 
-const controller = require('./kits.controller');
+const controller = require('./kit.controller');
 
 var router = new Router();
-
 /**
- * @api {post} /kits create
- * @apiName CreateKits
- * @apiGroup Kits
+ * @api {post} /kit create
+ * @apiName CreateKit
+ * @apiGroup Kit
  *
  * @apiParam {String} name .
  *
@@ -17,44 +16,44 @@ var router = new Router();
 router.post('/', controller.create);
 
 /**
- * @api {get} /kits all
- * @apiName GetAllKits
- * @apiGroup Kits
+ * @api {get} /kit all
+ * @apiName GetAllKit
+ * @apiGroup Kit
  * @apiSuccess {Object} - contain items from resource.
  */
-router.get('/',  controller.getAll);
+router.get('/',	controller.getAll);
 
 /**
- * @api {get} /kits/:id  get
- * @apiName GetKitsById
- * @apiGroup Kits
+ * @api {get} /kit/:id	get
+ * @apiName GetKitById
+ * @apiGroup Kit
  *
  * @apiParam {String} id .
  *
  * @apiSuccess {Object} - resource.
  */
-router.get('/:kits_id',  controller.getByID);
+router.get('/:kit_id',	controller.getByID);
 
 /**
- * @api {delete} /kits/:id  delete
- * @apiName RemoveKitsById
- * @apiGroup Kits
+ * @api {delete} /kit/:id	delete
+ * @apiName RemoveKitById
+ * @apiGroup Kit
  *
  * @apiParam {String} id .
  *
  * @apiSuccess {Object} - contain message.
  */
-router.delete('/:kits_id',  controller.removeByID);
+router.delete('/:kit_id',	controller.removeByID);
 
 /**
- * @api {put} /kits/:id  update
- * @apiName UpdateKitsById
- * @apiGroup Kits
+ * @api {put} /kit/:id	update
+ * @apiName UpdateKitById
+ * @apiGroup Kit
  *
  * @apiParam {String} id .
  *
  * @apiSuccess {Object} - contain message.
  */
-router.put('/:kits_id', controller.updateByID);
+router.put('/:kit_id', controller.updateByID);
 
 module.exports = router;

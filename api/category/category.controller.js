@@ -1,56 +1,48 @@
 /**
  * Using Rails-like standard naming convention for endpoints.
- * POST	/kits			   ->  create
- * GET	 /kits			   ->  getAll
- * GET	 /kits /:id		  ->  getByID
- * DELETE  /kits /:id		  ->  removeByID
- * PATCH   /kits /:id		  ->  updateByID
+ * POST	/category				 ->	create
+ * GET	 /category				 ->	getAll
+ * GET	 /category /:id			->	getByID
+ * DELETE	/category /:id			->	removeByID
+ * PATCH	 /category /:id			->	updateByID
  */
 
 //const _ = require('lodash');
 //const {ObjectID} = require('mongodb');
 const GLOBAL_RESPONSES = require('../global/responses');
 const LOCAL_RESPONSES = require('./responses');
-const MODEL_PATH = './model/kits';
-const MODEL_SERVICE = require(MODEL_PATH);
-const Category = require('./../categories/model/categories');
+const {Category,Kit} = require('./../sequelize');
 
 exports.create = function(req, res) {
-	let ModelInstance = MODEL_SERVICE;
+	let ModelInstance = Category;
 	// force: true will drop the table if it already exists
 	ModelInstance.sync({force: false}).then(function () {
-	// Table created
-		Category.findOne({where: {
-			id: req.body.category_id,
-		}}).then(cat => {
-			return ModelInstance.create({
-				name : req.body.name,
-				category: cat
-			},{include: Category}).then((kits) => {
-				let resultResponse = GLOBAL_RESPONSES.CREATE_SUCCESS;
-				resultResponse.resourceId = kits.dataValues.id;
-				res.json({resultResponse});
-			}).catch((err) =>{
-				res.send(err);
-			});
+		// Table created
+		return ModelInstance.create({
+			name : req.body.name
+		}).then((category) => {
+			let resultResponse = GLOBAL_RESPONSES.CREATE_SUCCESS;
+			resultResponse.resourceId = category.dataValues.id;
+			res.json({resultResponse});
+		}).catch((err) =>{
+			res.send(err);
 		});
-		
 	});
 };
 
 
 exports.getAll = function (req, res) {
-	let ModelInstance = MODEL_SERVICE;
+	let ModelInstance = Category;
 	// force: true will drop the table if it already exists
 	ModelInstance.sync({force: false}).then(function () {
 		// Table created
-		return ModelInstance.findAll({
+		return ModelInstance.findAll({	
 			limit: 40
-		}).then((kits_result) => {
-			if(!kits_result || (kits_result && kits_result.length == 0)){
-				res.json(LOCAL_RESPONSES.KITS_NOT_FOUND);
+		}).then((category_result) => {
+			if(!category_result || (category_result && category_result.length == 0)){
+				res.json(LOCAL_RESPONSES.CATEGORY_NOT_FOUND);
 			}
-			res.json(kits_result);
+			res.json(category_result);
 		}).catch((err) =>{
 			res.send(err);
 		});
@@ -61,19 +53,20 @@ exports.getAll = function (req, res) {
 
 
 exports.getByID = function (req, res) {
-	let ModelInstance = MODEL_SERVICE;
+	let ModelInstance = Category;
 	// force: true will drop the table if it already exists
 	ModelInstance.sync({force: false}).then(function () {
 		// Table created
 		return ModelInstance.findOne({
+			include: [Kit],
 			where: {
-				id: req.params.kits_id,
+				id: req.params.category_id,
 			},
-		}).then((kits) => {
-			if(!kits){
-				res.json(LOCAL_RESPONSES.KITS_NOT_FOUND);
+		}).then((category) => {
+			if(!category){
+				res.json(LOCAL_RESPONSES.CATEGORY_NOT_FOUND);
 			}
-			res.json(kits);
+			res.json(category);
 		}).catch((err) =>{
 			res.send(err);
 		});
@@ -83,13 +76,13 @@ exports.getByID = function (req, res) {
 
 
 exports.removeByID = function (req, res) {
-	let ModelInstance = MODEL_SERVICE;
+	let ModelInstance = Category;
 	// force: true will drop the table if it already exists
 	ModelInstance.sync({force: false}).then(function () {
 		// Table created
 		return ModelInstance.destroy({
 			where: {
-				id: req.params.kits_id,
+				id: req.params.category_id,
 			},
 		}).then((/*results*/) => {
 			res.json(GLOBAL_RESPONSES.DELETE_SUCCESS);
@@ -102,10 +95,10 @@ exports.removeByID = function (req, res) {
 
 
 exports.updateByID = function (req, res) {
-	let ModelInstance = MODEL_SERVICE;
+	let ModelInstance = Category;
 	// force: true will drop the table if it already exists
 	ModelInstance.sync({force: false}).then(function () {
-		ModelInstance.find({ where: { id: req.params.kits_id } }).then((model) =>
+		ModelInstance.find({ where: { id: req.params.category_id } }).then((model) =>
 		{
 		// Check if record exists in db
 			if (model) {
@@ -119,7 +112,28 @@ exports.updateByID = function (req, res) {
 					});
 			}
 		}).catch((/*err*/) => {
-			res.send(LOCAL_RESPONSES.KITS_NOT_FOUND);
+			res.send(LOCAL_RESPONSES.CATEGORY_NOT_FOUND);	
 		});
 	});
+};
+
+exports.addKit = (req,res) => {
+	const {name} = req.body;
+	const CategoryId = req.params.category_id;
+	let ModelInstance = Category;
+	ModelInstance.findById(req.params.category_id)
+		.then(() => Kit.create({name,CategoryId}))
+		.then(() => Category.findOne({
+			include: [Kit],
+			where: {
+				id: CategoryId,
+			},
+		}).then((category) => {
+			if(!category){
+				res.json(LOCAL_RESPONSES.CATEGORY_NOT_FOUND);
+			}
+			res.json(category);
+		}).catch((err) =>{
+			res.send(err);
+		}));
 };
