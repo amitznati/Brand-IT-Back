@@ -18,8 +18,8 @@ const Product = ProductModel(sequelize,Sequelize);
 //Blog.belongsToMany(Tag, { through: BlogTag, unique: false });
 //Tag.belongsToMany(Blog, { through: BlogTag, unique: false });
 //Blog.belongsTo(User);
-Category.hasMany(Kit);
-Kit.belongsTo(Category);
+Category.hasMany(Kit, {foreignKey: 'category_id', sourceKey: 'id'});
+Kit.belongsTo(Category,{foreignKey: 'category_id', sourceKey: 'id'});
 
 Kit.belongsToMany(Product, { through: KitProduct, unique: false });
 Product.belongsToMany(Kit, { through: KitProduct, unique: false });

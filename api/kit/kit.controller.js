@@ -22,8 +22,7 @@ exports.create = function(req, res) {
 	ModelInstance.sync({force: false}).then(function () {
 		// Table created
 		return ModelInstance.create({
-			name : req.body.name,
-			CategoryId: req.body.category_id
+			...req.body
 		}).then((kit) => {
 			let resultResponse = GLOBAL_RESPONSES.CREATE_SUCCESS;
 			resultResponse.resourceId = kit.dataValues.id;
