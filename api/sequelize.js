@@ -6,6 +6,7 @@ const {Op} = Sequelize;
 const CategoryModel = require('./category/model/category');
 const KitModel = require('./kit/model/kit');
 const ProductModel = require('./product/model/product');
+const ThemeModel = require('./theme/model/theme');
 //const User = UserModel(sequelize, Sequelize);
 // BlogTag will be our way of tracking relationship between Blog and Tag models
 // each Blog can have multiple tags and each Tag can have multiple blogs
@@ -15,6 +16,7 @@ const KitProduct = sequelize.define('kit_product', {});
 const Category = CategoryModel(sequelize,Sequelize);
 const Kit = KitModel(sequelize,Sequelize);
 const Product = ProductModel(sequelize,Sequelize);
+const Theme = ThemeModel(sequelize,Sequelize);
 //Blog.belongsToMany(Tag, { through: BlogTag, unique: false });
 //Tag.belongsToMany(Blog, { through: BlogTag, unique: false });
 //Blog.belongsTo(User);
@@ -33,5 +35,6 @@ module.exports = {
 	Op,
 	Category,
 	Kit,
-	Product
+	Product,
+	Theme
 };

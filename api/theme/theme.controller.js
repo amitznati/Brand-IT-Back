@@ -1,28 +1,31 @@
 /**
  * Using Rails-like standard naming convention for endpoints.
- * POST	/category				 ->	create
- * GET	 /category				 ->	getAll
- * GET	 /category /:id			->	getByID
- * DELETE	/category /:id			->	removeByID
- * PATCH	 /category /:id			->	updateByID
+ * POST	/theme				 ->	create
+ * GET	 /theme				 ->	getAll
+ * GET	 /theme /:id			->	getByID
+ * DELETE	/theme /:id			->	removeByID
+ * PATCH	 /theme /:id			->	updateByID
  */
 
 //const _ = require('lodash');
 //const {ObjectID} = require('mongodb');
 const GLOBAL_RESPONSES = require('../global/responses');
 const LOCAL_RESPONSES = require('./responses');
-const {Category,Kit} = require('./../sequelize');
+
+const {Theme} = require('./../sequelize');
+
+
 
 exports.create = function(req, res) {
-	let ModelInstance = Category;
+	let ModelInstance = Theme;
 	// force: true will drop the table if it already exists
 	ModelInstance.sync({force: false}).then(function () {
 		// Table created
 		return ModelInstance.create({
-			name : req.body.name
-		}).then((category) => {
+			...req.body
+		}).then((theme) => {
 			let resultResponse = GLOBAL_RESPONSES.CREATE_SUCCESS;
-			resultResponse.resourceId = category.dataValues.id;
+			resultResponse.resourceId = theme.dataValues.id;
 			res.json({resultResponse});
 		}).catch((err) =>{
 			res.send(err);
@@ -32,17 +35,17 @@ exports.create = function(req, res) {
 
 
 exports.getAll = function (req, res) {
-	let ModelInstance = Category;
+	let ModelInstance = Theme;
 	// force: true will drop the table if it already exists
 	ModelInstance.sync({force: false}).then(function () {
 		// Table created
-		return ModelInstance.findAll({	
+		return ModelInstance.findAll({
 			limit: 40
-		}).then((category_result) => {
-			if(!category_result || (category_result && category_result.length == 0)){
-				res.json(LOCAL_RESPONSES.CATEGORY_NOT_FOUND);
+		}).then((theme_result) => {
+			if(!theme_result || (theme_result && theme_result.length == 0)){
+				res.json(LOCAL_RESPONSES.THEME_NOT_FOUND);
 			}
-			res.json(category_result);
+			res.json(theme_result);
 		}).catch((err) =>{
 			res.send(err);
 		});
@@ -53,20 +56,19 @@ exports.getAll = function (req, res) {
 
 
 exports.getByID = function (req, res) {
-	let ModelInstance = Category;
+	let ModelInstance = Theme;
 	// force: true will drop the table if it already exists
-	ModelInstance.sync({force: false}).then(function () {
+	ModelInstance.sync().then(function () {
 		// Table created
-		return ModelInstance.findOne({
-			include: [{model: Kit, attributes: ['id','name']}],
+		return Theme.findOne({
 			where: {
-				id: req.params.category_id,
+				id: req.params.theme_id,
 			},
-		}).then((category) => {
-			if(!category){
-				res.json(LOCAL_RESPONSES.CATEGORY_NOT_FOUND);
+		}).then((theme) => {
+			if(!theme){
+				res.json(LOCAL_RESPONSES.PRODUCT_NOT_FOUND);
 			}
-			res.json(category);
+			res.json(theme);
 		}).catch((err) =>{
 			res.send(err);
 		});
@@ -76,13 +78,13 @@ exports.getByID = function (req, res) {
 
 
 exports.removeByID = function (req, res) {
-	let ModelInstance = Category;
+	let ModelInstance = Theme;
 	// force: true will drop the table if it already exists
 	ModelInstance.sync({force: false}).then(function () {
 		// Table created
 		return ModelInstance.destroy({
 			where: {
-				id: req.params.category_id,
+				id: req.params.theme_id,
 			},
 		}).then((/*results*/) => {
 			res.json(GLOBAL_RESPONSES.DELETE_SUCCESS);
@@ -95,15 +97,15 @@ exports.removeByID = function (req, res) {
 
 
 exports.updateByID = function (req, res) {
-	let ModelInstance = Category;
+	let ModelInstance = Theme;
 	// force: true will drop the table if it already exists
 	ModelInstance.sync({force: false}).then(function () {
-		ModelInstance.find({ where: { id: req.params.category_id } }).then((model) =>
+		ModelInstance.find({ where: { id: req.params.theme_id } }).then((model) =>
 		{
 		// Check if record exists in db
 			if (model) {
 				model.updateAttributes({
-					name: req.body.name
+					...req.body
 				})
 					.then(() => {
 						res.json(GLOBAL_RESPONSES.UPDATE_SUCCESS);
@@ -112,28 +114,7 @@ exports.updateByID = function (req, res) {
 					});
 			}
 		}).catch((/*err*/) => {
-			res.send(LOCAL_RESPONSES.CATEGORY_NOT_FOUND);	
+			res.send(LOCAL_RESPONSES.THEME_NOT_FOUND);	
 		});
 	});
-};
-
-exports.addKit = (req,res) => {
-	const {name} = req.body;
-	const CategoryId = req.params.category_id;
-	let ModelInstance = Category;
-	ModelInstance.findById(req.params.category_id)
-		.then(() => Kit.create({name,CategoryId}))
-		.then(() => Category.findOne({
-			include: [Kit],
-			where: {
-				id: CategoryId,
-			},
-		}).then((category) => {
-			if(!category){
-				res.json(LOCAL_RESPONSES.CATEGORY_NOT_FOUND);
-			}
-			res.json(category);
-		}).catch((err) =>{
-			res.send(err);
-		}));
 };

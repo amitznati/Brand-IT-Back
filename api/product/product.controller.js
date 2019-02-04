@@ -72,7 +72,7 @@ exports.getByID = function (req, res) {
 	ModelInstance.sync().then(function () {
 		// Table created
 		return Product.findOne({
-			include: [{model: Kit, through: { attributes: [] }}],
+			include: [{model: Kit, attributes: { exclude: ['category_id'] },through: { attributes: [] }}],
 			where: {
 				id: req.params.product_id,
 			},
