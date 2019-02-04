@@ -2,7 +2,7 @@
 const Sequelize = require('sequelize');
 const config		= require('../db');
 var sequelize = new Sequelize(config.sql.db);
-
+const {Op} = Sequelize;
 const CategoryModel = require('./category/model/category');
 const KitModel = require('./kit/model/kit');
 const ProductModel = require('./product/model/product');
@@ -21,8 +21,8 @@ const Product = ProductModel(sequelize,Sequelize);
 Category.hasMany(Kit, {foreignKey: 'category_id', sourceKey: 'id'});
 Kit.belongsTo(Category,{foreignKey: 'category_id', sourceKey: 'id'});
 
-Kit.belongsToMany(Product, { through: KitProduct, unique: false });
-Product.belongsToMany(Kit, { through: KitProduct, unique: false });
+Kit.belongsToMany(Product, { through: KitProduct });
+Product.belongsToMany(Kit, { through: KitProduct });
 
 sequelize.sync({ force: true })
 	.then(() => {
@@ -30,6 +30,7 @@ sequelize.sync({ force: true })
 	});
 
 module.exports = {
+	Op,
 	Category,
 	Kit,
 	Product

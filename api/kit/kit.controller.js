@@ -12,7 +12,7 @@
 const GLOBAL_RESPONSES = require('../global/responses');
 const LOCAL_RESPONSES = require('./responses');
 
-const {Kit,Category} = require('./../sequelize');
+const {Kit,Category, Product} = require('./../sequelize');
 
 
 
@@ -61,13 +61,14 @@ exports.getByID = function (req, res) {
 	ModelInstance.sync().then(function () {
 		// Table created
 		return Kit.findOne({
-			include: [Category],
+			include: [Category,{model: Product,attributes: ['id','name']}],
 			where: {
 				id: req.params.kit_id,
 			},
+			attributes: ['id','name']
 		}).then((kit) => {
 			if(!kit){
-				res.json(LOCAL_RESPONSES.KIT_NOT_FOUND);
+				res.json(LOCAL_RESPONSES.PRODUCT_NOT_FOUND);
 			}
 			res.json(kit);
 		}).catch((err) =>{
