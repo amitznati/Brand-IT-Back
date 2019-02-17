@@ -1,10 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-import passport from 'passport';
 const config = require('./db');
 
-const users = require('./routes/user'); 
 
 if(config.useMongo) {
 	mongoose.connect(config.mongo.dbUrl, { useNewUrlParser: true }).then(
@@ -28,22 +26,32 @@ if(config.useSql){
 }
 
 const app = express();
-app.use(passport.initialize());
-require('./passport')(passport);
+app.use((req, res, next) => {
+	if (process.env.NODE_ENV == 'development') {
+		res.header('Cache-Control',
+			'private, no-cache, no-store, must-revalidate');
+		res.header('Expires', '-1');
+		res.header('Pragma', 'no-cache');
+	}
+	res.header('Access-Control-Allow-METHODS',
+		'GET,PUT,POST,DELETE,HEAD,OPTIONS');
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header('Access-Control-Allow-Headers',
+		'X-ACCESS_TOKEN, Access-Control-Allow-Origin, Authorization, Origin, x-requested-with, Content-Type, Content-Range, Content-Disposition, Content-Description');
+	next();
+});
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use('/api/users', users);
 
 // REGISTER OUR ROUTES -------------------------------
-require('./routes/api').default(app);
+require('./routes').default(app);
 
 app.get('/', function(req, res) {
 	res.send('hello');
 });
 
-app.use(express.static('./../uploads/themes/'));
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

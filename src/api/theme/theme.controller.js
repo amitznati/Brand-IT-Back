@@ -118,3 +118,14 @@ exports.updateByID = function (req, res) {
 		});
 	});
 };
+
+exports.getFile = function (req, res) {
+	var path = require('path');
+	var fs = require('fs');
+	var filePath = path.resolve(`${__dirname}/../../../uploads/themes/${req.params.name}/${req.params.themeId}`);
+	if (fs.existsSync(filePath)) {
+		res.sendFile(filePath);
+	} else {
+		res.send(null);
+	}
+};

@@ -7,4 +7,5 @@ module.exports = {
 	mongo: {
 		dbUrl:  process.env.MONGO_URL || 'mongodb://branditdb_user:Nvrcungahl26@ds129914.mlab.com:29914/branditdb'
 	},
+	JWT_SECRET:'AMITZNATI',
 };

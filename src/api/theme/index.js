@@ -17,7 +17,16 @@ var storage =  multer.diskStorage({
 	}
 });
 var upload = multer({ storage });
-var cpUpload = upload.fields([{ name: 'bg-p', maxCount: 1 }, { name: 'bg-l', maxCount: 1 }]);
+var cpUpload = upload.fields([
+	{ name: 'bg-p', maxCount: 1 }, 
+	{ name: 'bg-l', maxCount: 1 },
+	{ name: 'h', maxCount: 1 }, 
+	{ name: 'f', maxCount: 1 },
+	{ name: 'tl', maxCount: 1 }, 
+	{ name: 'tr', maxCount: 1 },
+	{ name: 'bl', maxCount: 1 }, 
+	{ name: 'br', maxCount: 1 }
+]);
 
 var router = new Router();
 /**
@@ -73,4 +82,5 @@ router.delete('/:theme_id',	controller.removeByID);
  */
 router.put('/:theme_id', controller.updateByID);
 
+router.get('/:name/:themeId', controller.getFile);
 module.exports = router;
