@@ -53,7 +53,7 @@ exports.getAll = function (req, res) {
 		return ModelInstance.findAll({
 			limit: 40
 		}).then((product_result) => {
-			if(!product_result || (product_result && product_result.length == 0)){
+			if(!product_result || (product_result && product_result.length === 0)){
 				res.json(LOCAL_RESPONSES.KIT_NOT_FOUND);
 			}
 			res.json(product_result);
@@ -62,7 +62,7 @@ exports.getAll = function (req, res) {
 		});
 
 	});
-	
+
 };
 
 
@@ -126,7 +126,7 @@ exports.updateByID = function (req, res) {
 					});
 			}
 		}).catch((/*err*/) => {
-			res.send(LOCAL_RESPONSES.KIT_NOT_FOUND);	
+			res.send(LOCAL_RESPONSES.KIT_NOT_FOUND);
 		});
 	});
 };
