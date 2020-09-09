@@ -87,3 +87,5 @@ typings/
 
 # FuseBox cache
 .fusebox/
+dist
+.idea
